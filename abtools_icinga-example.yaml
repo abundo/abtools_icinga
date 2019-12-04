@@ -1,0 +1,57 @@
+---
+default_domain: "net.example.com"
+
+# How to communicate with Element API
+elements:
+  api:
+    url: "https://control.net.example.com/api/elements"
+
+# How to communicate with Icinga
+icinga:
+  api:
+    url: https://127.0.0.1:5665
+    username: <username>
+    password: <password>
+
+notify:
+  email:
+    sender: Notify <notify@example.com>
+
+icinga_sync:
+
+  hosts_file:
+    tmp: /tmp/pe-elements-hosts.conf
+    dst: /etc/icinga2/conf.d/pe-elements-hosts.conf
+  users_file:
+    tmp: /tmp/pe-users.conf
+    dst: /etc/icinga2/conf.d/pe-users.conf
+
+  default_notification: |2
+    vars.notification["mail"] = {
+      groups = [ "icingaadmins" ]
+    }
+
+  host_template: |
+
+    object Host "{hostname}" {{
+      import "generic-host"
+
+      address = "{ipv4_addr}"
+
+      vars.pe_manufacturer = "{manufacturer}"
+      vars.pe_model = "{model}"
+      vars.pe_role = "{role}"
+      vars.pe_platform = "{platform}"
+      vars.pe_comments = {comments}
+      vars.pe_site_name = "{site_name}"
+    {_options}
+    }}
+
+
+  user_template: |
+  
+    object User "{username}" {{
+      display_name = "{displayname}"
+      email = "{email}"
+    }}
+
